@@ -29,7 +29,6 @@ if __name__ == "__main__":
 
     for line in lines: 
         payload = {'usuario': line.strip()}
-        
         r = requests.post(url, data = payload)
         if look_for_exitcode(remove_html(r.text)) == True:
             print('User ' + line.strip() + ' exists')
