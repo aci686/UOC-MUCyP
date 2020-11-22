@@ -6,11 +6,46 @@
 		
 		<?php
 			$conf = $_SERVER['DOCUMENT_ROOT'];
-			$conf .= "/conf.php";
+			$conf .= '/conf.php';
 			require_once($conf);
 		?>
 		
 	</head>
 	<body>
+		<?php
+			$message = '';
+			if(isset($_POST["login"])) {
+				$query = 'SELECT * FROM Users WHERE Email = :user_email;';
+				$statement = $connect->prepare($query);
+				$statement->execute(
+					array(
+						'user_email'	=>	$_POST['user_email']
+					)
+				);
+				$count = $statement->rowCount();
+				if($count > 0) {
+					$result = $statement->fetchAll();
+					foreach($result as $row) {
+						if($row['Password'] == $_POST['user_password']) {
+							$_SESSION['email'] = $_POST['user_email'];
+							header('location: index.php');
+						} else {
+							$message = 'Wrong username or password';
+						}
+					}
+				} else {
+					$message = 'Wrong username or password';
+				}
+			} else {
+				$message = 'Please login first';
+			}
+		?>
+		<form id="Login" method="post">
+			<?php echo $message;?>
+			<br>
+			Email<input type="email" name="user_email"/>
+			Password<input type="password" name="user_password"/>
+			<button type="submit" name="login">Login</button>
+		</form>
 	</body>
 </html>
