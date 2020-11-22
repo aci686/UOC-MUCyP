@@ -133,6 +133,8 @@ if match:
                                 tbinfo[__].append(content)
                             else:
                                 print(bcolors.FAIL + "Row content not found!" + bcolors.ENDC)
+                    for _ in zip(*([key] + (value) for key, value in tbinfo.items())):
+                        print(''.join([str(__).ljust(20) for __ in _]))
                 else:
                     print("bcolors.FAIL + No rows found!" + bcolors.ENDC)
             else:
@@ -141,9 +143,6 @@ if match:
         print("bcolors.FAIL + No tables found!" + bcolors.ENDC)
 else:
     print("bcolors.FAIL + Database name not found!" + bcolors.ENDC)
-
-for _ in zip(*([key] + (value) for key, value in tbinfo.items())):
-    print(''.join([str(__).ljust(20) for __ in _]))
 
 if __name__=="__main__":
 	args=parser.parse_args()
