@@ -1,4 +1,4 @@
 <?php
-	$connect = new PDO('mysql:host=localhost;dbname=news', 'user', 'password');
-	session_start();
+	$connect = new PDO ('mysql:host=localhost;dbname=news', 'user', 'password');
+	session_start ();
 ?>

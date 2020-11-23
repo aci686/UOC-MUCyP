@@ -7,10 +7,8 @@
 			$conf = $_SERVER['DOCUMENT_ROOT'];
 			$conf .= "/conf.php";
 			require_once ($conf);
-			//if (!isset ($_SESSION["email"])) header ("location:login.php");
 		?>
 	</head>
-	<body>
 	<body style = 'font-family:verdana; margin: 0px;'>
 	<div style = 'display: flex; background-color: #000000; height: 10px;'></div>
 		<div style = 'display: flex; justify-content: flex-end; padding-top: 20px;'>
@@ -30,20 +28,38 @@
 				<h2><a href='index.php' style = 'color: #aaaaaa; text-decoration:none; padding-right: 30px;'>Home</a><a href='#' style = 'color: #aaaaaa; text-decoration:none; padding-right: 30px;'>About</a><a href='#' style = 'color: #aaaaaa; text-decoration:none;'>Contact</a></h2>
 			</div>
 		</div>
-        <div  style = 'display: flex; background-color: #dddddd;'>
-            <?php
-                $query = 'SELECT Id FROM News;';
-		    	$statement = $connect->prepare ($query);
-		    	$statement->execute ();
-		    	$count = $statement->rowCount ();
-		    	if ($count > 0) {
-		    		$result = $statement->fetchAll ();
-		    		foreach ($result as $row) {
-                        echo '<a href=news.php?id='.$row['Id'].' style = \'color: #000000; text-decoration:none; font-size: 1.2em;\'>Noticia '.$row['Id'].'</a>';
-                    }
-                }
-            ?>
-        </div>
+		<div style = 'display: flex; background-color: #dddddd;'>
+			<h1>Noticias</h1>
+		</div>
+		<div style = 'display: flex; background-color: #dddddd;'>
+		<div style = 'margin-left: 25px; padding-left: 25px; width: 50px; height: 30px; 0px; background: #ffffff; -moz-border-radius: 0px 0px 100px 100px; -webkit-border-radius: 0px 0px 100px 100px; border-radius: 0px 0px 100px 100px;'></div>
+		</div>
+		<?php
+			if (isset($_GET['id'])) {
+				$query = 'SELECT Title, Body, Datetime FROM News WHERE id=:id;';
+				$statement = $connect->prepare ($query);
+				$statement->execute (array ('id'=>$_GET['id']));
+				$row = $statement->fetch ();
+				$title = $row[0];
+				$body = $row[1];
+				$datetime = strtotime ($row[2]);
+			}
+        ?>
+		<div style = 'display: flex; background-color: #dddddd;'>
+			<div style = 'margin-left: 20px;'>
+				<?php echo '<h2>'.$title.'</h2>';?>
+			</div>
+		</div>
+		<div style = 'display: flex; background-color: #dddddd;'>
+			<div style = 'margin-left: 20px;'>
+				<?php echo '<h4>'.date('d/m/Y h:i:s', $datetime).'</h4>';?>
+			</div>
+		</div>
+		<div style = 'display: flex; background-color: #dddddd;'>
+			<div style = 'margin-left: 20px;padding-bottom: 25px;'>
+				<?php echo $body;?>
+			</div>
+		</div>
 		<div style = 'display: flex; background-color: #cccccc; height: 10px'></div>
 	</body>
 	<script>
@@ -57,5 +73,4 @@
 			window.location.href = "login.php";
 		}
 	</script>
-	</body>
 </html>
