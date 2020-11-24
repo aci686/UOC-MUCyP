@@ -1,0 +1,6 @@
+mongo
+use database actividad4
+use actividad4
+db.createCollection('users')
+db.users.insert({name: 'admin@admin.com', password: 'password'})
+db.users.insert({name: 'guest@guest.com', password: 'drowssap'})
