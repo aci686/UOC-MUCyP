@@ -17,7 +17,7 @@
                 try {
 					if ('[$ne]=1' == $_POST['user_password']) $message = 'Injection detected!';
 					else {
-						$user = $collection->find (array('name'=>filter_var($_POST['user_email'], FILTER_VALIDATE_EMAIL),'password'=>implode($_POST['user_password'])));
+						$user = $collection->find (array('name'=>$_POST['user_email'],'password'=>$_POST['user_password']));
 						if ($user->count()) {
 							$message = 'Login successful!';
 						} else $message = 'Username or Password incorrect!';
