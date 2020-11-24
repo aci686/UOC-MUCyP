@@ -28,7 +28,7 @@
 			<?php echo $message.'<br>';?>
 			<br>
 			Email<input type = "email" name = "user_email"/>
-			Password<input type = "text" name = "user_password"/>
+			Password<input type = "password" name = "user_password"/>
 			<button type = "submit" name = "login">Login</button>
 		</form>
 	</body>
