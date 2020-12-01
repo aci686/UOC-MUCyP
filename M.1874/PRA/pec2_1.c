@@ -13,5 +13,4 @@ void main(void) {
     puts("Insert your input here: ");
     gets(input_s);
     printf("Your input was: %s", input_s);
-    exit(0);
 }
