@@ -13,20 +13,26 @@ __license__ = "MIT"
 
 import argparse, string
 from datetime import date, timedelta
+from tqdm import tqdm
 
 """ Generates all possible passwords from the name """ 
-def generate_dictionary(fullname):
+def generate_dictionary(fullname, output):
     start_date = date(1900, 1, 1)
     end_date = date.today()
     time_frame = end_date - start_date
-    for _ in range(time_frame.days):
-        print(fullname[0][0] + fullname[1][0] + (start_date + timedelta(days = _)).strftime("%d%m%Y"))
+    with tqdm(total=100, desc="Generating passwords") as pbar:
+        file = open(output, "a")
+        for _ in range(time_frame.days):
+            file.write(fullname[0][0] + fullname[1][0] + (start_date + timedelta(days = _)).strftime("%d%m%Y") + "\n")
+            pbar.update(100/time_frame.days)
+        file.close()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-n", "--name", nargs="+", required = True, help  = "User full name")
+parser.add_argument("-n", "--name", nargs="+", required=True, help="User full name")
+parser.add_argument("-o", "--output", default="dictionary.out", help="Output file name")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     print("Generating all possible passwords for: ", end = "")
     print(" ".join([str(_) for _ in args.name]))
-    generate_dictionary(args.name)
+    generate_dictionary(args.name, args.output)
