@@ -5,10 +5,10 @@ Accepts a Youtube watch-history json file and plots an histogram with the number
 Considers the whole file
 '''
 
-__author__ = "Aaron Castro"
-__author_email__ = "aaron.castro.sanchez@outlook.com"
-__copyright__ = "Aaron Castro"
-__license__ = "MIT"
+__author__ = 'Aaron Castro'
+__author_email__ = 'aaron.castro.sanchez@outlook.com'
+__copyright__ = 'Aaron Castro'
+__license__ = 'MIT'
 
 import json, argparse
 import pandas as pd
