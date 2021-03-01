@@ -11,7 +11,6 @@ __copyright__ = 'Aaron Castro'
 __license__ = 'MIT'
 
 import json, argparse
-import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 
