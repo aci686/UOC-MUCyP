@@ -3,7 +3,6 @@
 import sys
 # import SHA-256 hash function library
 
-
 # Expected Merkle roots
 test_expected_merkle_root = 'b113d8475b3a318ef80db74b16e94bdeafdffdbff28eeec4161289689b15168b'
 ex_expected_merkle_root = '6dbba50b72ad0569c2449090a371516e3865840e905483cac0f54d96944eee28'
@@ -77,19 +76,20 @@ ex_Transactions = [
     '6a9fa4566fd2454f73daf71005c9f2ddb75e1c0ced2bcab89472583d60d92a4b'
 ]
 
-
 # Function - Convert transactions from big endian into little endian (hex)
 def big_endian_to_little_endian(transaction):
+    _ = bytearray.fromhex(transaction)
+    _.reverse()
+    __ = ''.join(format(v, '02x') for v in _)
+    
+    return(__)
+
+# Function - Calculate Merkle root
+def merkle_root_func(transactions_set):
     # CODE HERE
-
-
-    # Function - Calculate Merkle root
-    def merkle_root_func(transactions_set):
-        # CODE HERE
-        # use the function big_endian_to_little_endian(...)
-        # merkle_root = ...
-        # return merkle_root
-
+    # use the function big_endian_to_little_endian(...)
+    # merkle_root = ...
+    # return merkle_root
 
 # DO NOT MODIFY THIS FUNCTION
 # Test merkle_root_func(...) function
@@ -128,6 +128,5 @@ def check_merkle_root():
 
         else:
             print("Invalid option!\n")
-
 
 check_merkle_root()
