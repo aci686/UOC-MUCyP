@@ -2,6 +2,9 @@
 
 import sys
 # import SHA-256 hash function library
+from hashlib import sha256
+# REMOVE
+import binascii
 
 # Expected Merkle roots
 test_expected_merkle_root = 'b113d8475b3a318ef80db74b16e94bdeafdffdbff28eeec4161289689b15168b'
@@ -78,15 +81,40 @@ ex_Transactions = [
 
 # Function - Convert transactions from big endian into little endian (hex)
 def big_endian_to_little_endian(transaction):
-    _ = bytearray.fromhex(transaction)
-    _.reverse()
-    __ = ''.join(format(v, '02x') for v in _)
-    
-    return(__)
+    # Reverse and decode
+    return(binascii.unhexlify(transaction)[::-1])
+
+# Funcion - Convert hashes from little endian to big endian (hex)
+def little_endian_to_big_endian(transaction):
+    # Reverse and code
+    return(binascii.hexlify(transaction[::-1]))
+
+# Function - Hashes transaction couple twice
+def hash_couple(transactionA, transactionB):
+    # Concatenate both transactions after changing to little endian
+    concat_le_tAB = big_endian_to_little_endian(transactionA) + big_endian_to_little_endian(transactionB)
+    # Hash twice
+    hashed = sha256(sha256(concat_le_tAB).digest()).digest()
+
+    return(little_endian_to_big_endian(hashed))
 
 # Function - Calculate Merkle root
 def merkle_root_func(transactions_set):
     # CODE HERE
+    # If we reach a length 1 list, that's our merkle root
+    if len(transactions_set) == 1:
+        return(transactions_set[0].decode())
+    # Create a temporary hashes list
+    hashed_transactions_set = []
+    # Couple hashes and calculate double hash
+    for _ in range(0, len(transactions_set)-1, 2):
+        hashed_transactions_set.append(hash_couple(transactions_set[_], transactions_set[_+1]))
+    # If we have an odd length list, hash last one with himself
+    if len(transactions_set) % 2 == 1:
+        hashed_transactions_set.append(hash_couple(transactions_set[-1], transactions_set[-1]))
+
+    # Roll until we reach a single hash
+    return(merkle_root_func(hashed_transactions_set))
     # use the function big_endian_to_little_endian(...)
     # merkle_root = ...
     # return merkle_root
@@ -114,7 +142,7 @@ def check_merkle_root():
             if test_expected_merkle_root == merkle_root:
                 sys.exit('Well done, Merkle root values match!')
             else:
-                sys.exit("Check your function, Merkle root values ​​do not match!")
+                sys.exit("Check your function, Merkle root values do not match!")
 
         elif(value == '2'):
             print(f'Checking calculated Merkle root against the expected value')
@@ -124,7 +152,7 @@ def check_merkle_root():
             if ex_expected_merkle_root == merkle_root:
                 sys.exit('Well done, Merkle root values match!')
             else:
-                sys.exit("Check your function, Merkle root values ​​do not match!")
+                sys.exit("Check your function, Merkle root values do not match!")
 
         else:
             print("Invalid option!\n")
