@@ -11,7 +11,7 @@ import struct
 version = 1
 
 # Previous hash (32 bytes) - Double sha256 of your first name = sha256(sha256("firstname"))
-prev_hash = sha256(sha256('Aaron'.encode('utf-8')).digest()).digest()[::-1]
+prev_hash = sha256(sha256('Aaron'.encode('utf-8')).digest()).hexdigest()[::-1]
 
 # Merkle root (32 bytes)
 merkle_root = '6dbba50b72ad0569c2449090a371516e3865840e905483cac0f54d96944eee28'
@@ -28,20 +28,32 @@ nonce = 0
 # Function - Convert values from big endian into little endian (hex)
 def big_endian_to_little_endian(value):
     # CODE HERE
-    return(binascii.unhexlify(value)[::-1])
+    return (binascii.unhexlify(value)[::-1])
 
 # Function - PoW simulation
 # Don't forget to use the "big_endian_to_little_endian(value)" function!
 # Don't forget to save the nonce and timestamp values!
 def proof_of_work():
-    s_timestamp = time.time()
     # Iterate over the nonce to simulate real performance
     nonce = 0
     for _ in iter(int, 1):
-        header = struct.Struct('<L').pack(version) + prev_hash + big_endian_to_little_endian(merkle_root.encode('utf-8')) + struct.Struct('<L').pack(int(s_timestamp)) + big_endian_to_little_endian(bits) + struct.Struct('<L').pack(nonce)
-        block_hash = sha256(header).digest()
+        v = binascii.hexlify(struct.Struct('<L').pack(version)).decode()
+        m = binascii.hexlify(big_endian_to_little_endian(merkle_root.encode('utf-8'))).decode()
+        s_timestamp = time.time()
+        t = binascii.hexlify(struct.Struct('<L').pack(int(s_timestamp))).decode()
+        b = binascii.hexlify(big_endian_to_little_endian(bits.encode('utf-8'))).decode()
+        n = binascii.hexlify(struct.Struct('<L').pack(nonce)).decode()
+        header = str(v) + prev_hash + str(m) + str(t) + bits + str(n)
+        block_hash = sha256(sha256(header.encode('utf-8')).digest()).hexdigest()
         # Check if the block_hash is below the given target
         if str(block_hash) < target:
+            print('Version: ' + str(v))
+            print('Prev Hash: ' + str(prev_hash))
+            print('Merkle Root: ' + str(m))
+            print('Timestamp: ' + str(t))
+            print('Bits: ' + str(b))
+            print('Nonce: ' + str(n))
+            print('Header: ' + str(header))
             return block_hash
         nonce += 1
 
