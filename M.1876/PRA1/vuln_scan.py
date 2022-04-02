@@ -25,21 +25,17 @@ def get_arguments():
     required.add_argument("-i", "--image", help="docker image to scan", type=str, required=True)
     required.add_argument("-s", "--severity", help="show vulnerabilities for this level", choices=["medium", "high"], type=str, required=True)
     parser.add_argument("-k", "--keystring", help="key string to look for", type=str, default="")
-
+    
     args = parser.parse_args()
 
     return(args)
-  
-  # Vulnerability scanner
+
+# Vulnerability scanner
 def scan_vulns(image, severity, keystring):
     print("[i] Scanning {}...".format(image))
     # Run docker scan to the selected image and capture output
-    #scan=subprocess.run(["docker", "scan", "--severity", severity, "--json", image], capture_output=True, text=True)
-    samplefile = open("scan.sample.json","r")
-    data = samplefile.read()
-    samplefile.close()
-
-    json_file = json.loads(data)
+    scan = subprocess.run(["docker", "scan", "--severity", severity, "--json", image], capture_output=True, text=True)
+    json_file = json.loads(scan.stdout)
     data = json_file["vulnerabilities"]
     flag = False
     CVE = []
